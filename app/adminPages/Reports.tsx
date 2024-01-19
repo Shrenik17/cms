@@ -177,7 +177,7 @@ const Report = () => {
         if (!response.ok) {
           throw new Error("Error opening file");
         }
-        return response.blob();
+        return response.blob(); // extracts the binary data // binary data represents the PDF file.
       })
       .then((blob) => {
         // Create a temporary URL for the file
@@ -241,6 +241,7 @@ const Report = () => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 className="css-i6dzq1"
+                cursor="pointer"
                 onClick={() => openPdfInNewTab(cell)}
               >
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>

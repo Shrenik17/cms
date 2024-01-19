@@ -107,7 +107,7 @@ const Events = () => {
         setEditEventLink(res[0].eventNewsLink);
         setEditEventType(res[0].eventNewsType);
         setEditParticipants(res[0].participants);
-        // setEditSelectedImage(res[0].imagePath);
+        setEditSelectedImage(res[0].imagePath);
         setEditSelectedYear(res[0].eventNewsYear);
         setEditShortDesc(res[0].shortDesc);
       })
@@ -116,15 +116,12 @@ const Events = () => {
       });
   };
 
-  // console.log("data event", data);
-  // console.log("options", options);
+
   const getData = async () => {
     return await getAllEventsNews();
     // console.log("get members response", response);
   };
-  // useEffect(() => {
-  //   getData();
-  // }, []);
+ 
   const handleDelete = async (cellValue: any) => {
     let response = await deleteEventNews(cellValue.row.original.id);
     console.log(response);
@@ -166,10 +163,6 @@ const Events = () => {
 
   let columns = React.useMemo<Column<any>[]>(
     () => [
-      // {
-      //   Header: "Sr .No.",
-      //   accessor: "title",
-      // },
       {
         Header: "Title",
         accessor: "title",
@@ -277,13 +270,6 @@ const Events = () => {
   };
   let xdata = useMemo(() => data, [data]);
 
-  // let tableInstance = useTable({ columns, data });
-  // useEffect(()=>{
-  //   if(data && data.length){
-  //     tableInstance = useTable({ columns, data });
-  //   }
-  // },[data])
-
   const handleEditUpload = () => {
     if (editSelectedImage) {
       const formData = new FormData();
@@ -296,7 +282,7 @@ const Events = () => {
       formData.append("participants", editParticipants);
       // console.log("formData in edit", formData);
 
-      fetch(`http://127.0.0.1:5000/events/updateEventNews/${eventNewsID}`, {
+      fetch(baseUrl + `/events/updateEventNews/${eventNewsID}`, {
         method: "PUT",
         body: formData,
       })
@@ -752,7 +738,7 @@ const Events = () => {
                       <div className="flex justify-end mb-6">
                         <button
                           onClick={handleEditUpload}
-                          disabled={!editSelectedImage}
+                           disabled={!editSelectedImage}
                           className="btn btn-primary"
                         >
                           Submit

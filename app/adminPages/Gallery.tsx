@@ -8,7 +8,7 @@ import { baseUrl } from "../../constants";
 import { getAllGalleryImages , deleteGalleryImages } from "../Api/galleryAPI";
 const Gallery = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [title,setTitle] = useState("");
+  const [title, setTitle] = useState("");
   const [galleryImageLink, setGalleryImageLink] = useState("");
   const [editSelectedImage, setEditSelectedImage] = useState<File | null>(null);
   const [editTitle, setEditTitle] = useState("");
@@ -18,7 +18,7 @@ const Gallery = () => {
   const [shortDesc, setShortDesc] = useState("");
   const [editShortDesc, setEditShortDesc] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [responseType, setResponseType] = useState<any>("");
+
   const [isOpen, setIsOpen] = useState(false);
   const [dataUpdate, setDataUpdate] = useState(false);
 
@@ -33,13 +33,13 @@ const Gallery = () => {
       setEditSelectedImage(event.target.files[0]);
     }
   };
- 
+
   const formData = new FormData();
-  const handleUpload =() =>{
-    if(selectedFile){
-      formData.append("title",title);
-      formData.append("galleryImageLink",galleryImageLink);
-      formData.append("galleryImage",selectedFile);
+  const handleUpload = () => {
+    if (selectedFile) {
+      formData.append("title", title);
+      formData.append("galleryImageLink", galleryImageLink);
+      formData.append("galleryImage", selectedFile);
       formData.append("shortDesc", shortDesc);
 
       fetch(baseUrl + "/gallery/addGalleryImage", {
@@ -63,47 +63,48 @@ const Gallery = () => {
           setGalleryImageLink("");
           setTitle("");
           setShortDesc("");
-
         })
         .catch((error) => {
           console.error("Error uploading file:", error);
           // Handle the error and update the UI accordingly
         });
     }
-  }
- 
+  };
+
   const handleEdit = async (cell: any) => {
     setGalleryImageId(cell.row.original.id);
-    
-    await fetch(baseUrl + `/gallery/getGalleryImageById/${cell.row.original.id}`, {
-      method: "GET", // Use GET method for a GET request
-    })
-      .then((res) => res.json())
+
+    await fetch(
+      baseUrl + `/gallery/getGalleryImageById/${cell.row.original.id}`,
+      {
+        method: "GET", // Use GET method for a GET request
+      }
+    )
+      .then((res) =>{
+        console.log("response", res);
+        return res.json();
+      })
       .then((res) => {
         setEditTitle(res[0].title);
         setGalleryEditImageLink(res[0].galleryImageLink);
         setEditShortDesc(res[0].shortDesc);
+        setEditSelectedImage(res[0].imagePath)
       })
       .then(() => {
         openEditModal();
       });
   };
-  // const getData = async () => {
-  //   let response = await getAllGalleryImages();
-  //   setData(response.data);
-  //   if (response.type) {
-  //     setResponseType("true");
-  //   }
-  // };
-
   const getData = async () => {
-    return await getAllGalleryImages();
+    let response = await getAllGalleryImages();
+    console.log(response);
+    setData(response);
+   
   };
-  
+
   useEffect(() => {
     getData();
   }, []);
-  
+
   useEffect(() => {
     getData();
   }, [dataUpdate]);
@@ -120,98 +121,98 @@ const Gallery = () => {
     }
     // getData();
   };
-  
+
   let columns = React.useMemo<Column<any>[]>(
-      () => [
-        {
-          Header: "Title",
-          accessor: "title",
+    () => [
+      {
+        Header: "Title",
+        accessor: "title",
+      },
+      {
+        Header: "Image",
+        accessor: "galleryImage",
+        Cell: ({ cell }) => {
+          return (
+            <div className="flex items-center justify-center h-full">
+              <img
+                src={cell.row.original.imagePath} // Assuming cell.value contains the image URL
+                alt=""
+                style={{ width: "100px", height: "auto" }} // Adjust the size as needed
+              />
+            </div>
+          );
         },
-        {
-          Header: "Image",
-          accessor: "galleryImage",
-          Cell: ({ cell }) => {
-            return (
-              <div className="flex items-center justify-center h-full">
-                <img
-                  src={cell.row.original.imagePath} // Assuming cell.value contains the image URL
-                  alt=""
-                  style={{ width: "100px", height: "auto" }} // Adjust the size as needed
-                />
-              </div>
-            );
-          },
-        },
-        {
-          Header: "Link",
-          accessor: "galleryImageLink",
-        },
-        {
-          Header: "Description",
-          accessor: "shortDesc",
-          Cell: ({ cell }: any) => (
-            <div
-              style={{
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
+      },
+      {
+        Header: "Link",
+        accessor: "galleryImageLink",
+      },
+      {
+        Header: "Description",
+        accessor: "shortDesc",
+        Cell: ({ cell }: any) => (
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {cell.row.original.shortDesc.slice(0, 25)}
+          </div>
+        ),
+      },
+      {
+        Header: "Actions",
+        Cell: ({ cell }: any) => (
+          <div className="flex justify-center space-x-2">
+            <label
+              className="px-4 py-2 font-bold bg-blue-500 rounded cursor-pointer hover:bg-blue-700"
+              onClick={(e) => handleEdit(cell)}
+              htmlFor="my-modal-5"
             >
-              {cell.row.original.shortDesc.slice(0, 25)}
-            </div>
-          ),
-        },
-        {
-          Header: "Actions",
-          Cell: ({ cell }: any) => (
-            <div className="flex justify-center space-x-2">
-              <label
-                className="px-4 py-2 font-bold bg-blue-500 rounded cursor-pointer hover:bg-blue-700"
-                onClick={(e) => handleEdit(cell)}
-                htmlFor="my-modal-5"
+              <svg
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                stroke="black"
+                strokeWidth="1.5"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="css-i6dzq1"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="24"
-                  height="24"
-                  stroke="black"
-                  strokeWidth="1.5"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="css-i6dzq1"
-                >
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-              </label>
-  
-              <button
-                className="px-4 py-2 font-bold bg-red-500 rounded hover:bg-red-700"
-                onClick={(e) => handleDelete(cell)}
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </label>
+
+            <button
+              className="px-4 py-2 font-bold bg-red-500 rounded hover:bg-red-700"
+              onClick={(e) => handleDelete(cell)}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                stroke="red"
+                strokeWidth="1.5"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="css-i6dzq1"
               >
-                <svg
-                  viewBox="0 0 24 24"
-                  width="24"
-                  height="24"
-                  stroke="red"
-                  strokeWidth="1.5"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="css-i6dzq1"
-                >
-                  <polyline points="3 6 5 6 21 6"></polyline>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  <line x1="10" y1="11" x2="10" y2="17"></line>
-                  <line x1="14" y1="11" x2="14" y2="17"></line>
-                </svg>
-              </button>
-            </div>
-          ),
-        },
-      ],
-      []
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
+          </div>
+        ),
+      },
+    ],
+    []
   );
   const openEditModal = () => {
     setIsModalOpen(true);
@@ -226,15 +227,16 @@ const Gallery = () => {
       const formData = new FormData();
       formData.append("galleryImage", editSelectedImage);
       formData.append("title", editTitle);
-      formData.append("shortDesc", editShortDesc);   
+      formData.append("shortDesc", editShortDesc);
       formData.append("galleryImageLink", editGalleryImageLink);
 
-      // console.log("formData in edit", formData);
-
-      fetch(`http://127.0.0.1:5000/gallery/updateGalleryImages/${galleryImageId}`, {
-        method: "PUT",
-        body: formData,
-      })
+      fetch(
+        baseUrl +`/gallery/updateGalleryImages/${galleryImageId}`,
+        {
+          method: "PUT",
+          body: formData,
+        }
+      )
         .then((res) => {
           console.log("response", res);
           return res.json();
@@ -257,18 +259,16 @@ const Gallery = () => {
     closeEditModal();
     getData();
   };
-    
+
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-  useTable({ columns, data });
+    useTable({ columns, data });
   return (
     <div className="h-screen p-3 overflow-auto pb-28 bg-bggrey">
       <p className="pb-5 text-xl">Gallery Management</p>
       <ToastContainer />
       <div className="bg-white border border-grey">
         <div className="flex justify-between">
-          <div className="items-center justify-start mt-3">
-      
-          </div>
+          <div className="items-center justify-start mt-3"></div>
 
           <label
             className="block px-4 py-2 mx-3 my-3 font-semibold leading-tight text-white border border-gray-300 rounded shadow appearance-none cursor-pointer bg-blue hover:border-gray-400 focus:outline-none focus:shadow-outline"
@@ -301,10 +301,8 @@ const Gallery = () => {
                   {" "}
                   <div className="">
                     <div>
-                   
                       <div className="flex justify-between">
                         <div className="grid grid-cols-3 gap-4">
-                  
                           <div>
                             <label className="label">
                               <span className="text-lg label-text">
@@ -353,7 +351,7 @@ const Gallery = () => {
                               }
                             />
                           </div>
-                   
+
                           <div>
                             <label className="label">
                               <span className="text-lg label-text">
@@ -378,10 +376,9 @@ const Gallery = () => {
                           onClick={handleUpload}
                           disabled={
                             !selectedFile ||
-                            !title ||                  
+                            !title ||
                             !galleryImageLink ||
-                            !shortDesc 
-                         
+                            !shortDesc
                           }
                           className="btn btn-primary"
                         >
@@ -403,7 +400,7 @@ const Gallery = () => {
             <table className="min-w-full bg-white border border-grey">
               <thead>
                 {headerGroups.map((headerGroup, index) => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
+                  <tr  {...headerGroup.getHeaderGroupProps()}>
                     <th>Sr. No</th>
                     {headerGroup.headers.map((column, index) => (
                       <th
@@ -476,7 +473,6 @@ const Gallery = () => {
                     <div>
                       <div className="flex justify-between">
                         <div className="grid grid-cols-3 gap-4">
-                
                           <div>
                             <label className="label">
                               <span className="text-lg label-text">
@@ -525,7 +521,7 @@ const Gallery = () => {
                               }
                             />
                           </div>
-                          
+
                           <div>
                             <label className="label">
                               <span className="text-lg label-text">

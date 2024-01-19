@@ -18,10 +18,11 @@ export const getReport = async () => {
   };
 
   
-export const getReportById = async (props: any) => {
-  const res = await fetch(baseUrl + `/report/getReportById/${props}`, {
-    method: "GET", // Use GET method for a GET request
-  });
-  const data = await res.json();
-  return data[0];
-};
+// export const getReportById = async (props: any) => {
+//   const res = await fetch(baseUrl + `/report/getReportById/${props}`, {
+//     method: "GET", // Use GET method for a GET request
+//   });
+//   const data = await res.json();
+//   return data[0];
+// };
+

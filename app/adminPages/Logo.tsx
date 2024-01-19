@@ -1,34 +1,25 @@
-import React, { useState, useMemo } from "react";
-import { Column, useTable } from "react-table";
+import React, { useState ,useEffect} from 'react'
+import { Column , useTable} from 'react-table';
 import NoData from "../components/NoData";
 import { RxCross1 } from "react-icons/rx";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { baseUrl } from "../../constants";
-import Link from "next/link";
-import { deleteProjects, getAllProjects } from "../Api/projectsAPI";
-const Projects = () => {
+import { getAllLogoImages , deleteLogoImages } from "../Api/logoAPI";
+const Logo = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
-  const [projectLink, setProjectLink] = useState("");
-//  const [projectType, setProjectType] = useState("");
-  const [editSelectedYear, setEditSelectedYear] = useState("");
+  const [logoLink, setLogoLink] = useState("");
   const [editSelectedImage, setEditSelectedImage] = useState<File | null>(null);
   const [editTitle, setEditTitle] = useState("");
-  const [eventType, setEventType] = useState("");
-  const [editProjectLink, setEditProjectLink] = useState("");
-  const [editShortDesc, setEditShortDesc] = useState("");
-  const [editEventType, setEditEventType] = useState("");
- // const [editOptions, setEditOptions] = useState("");
-  const [projectID, setProjectID] = useState("");
-  const [shortDesc, setShortDesc] = useState("");
+  const [editLogoLink, setEditLogoLink] = useState("");
+  const [logoId, setLogoId] = useState("");
   const [data, setData] = useState<any>([]);
+  const [shortDesc, setShortDesc] = useState("");
+  const [editShortDesc, setEditShortDesc] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [options, setOptions] = useState("");
   const [dataUpdate, setDataUpdate] = useState(false);
-  // State to store the selected year
-  const [selectedYear, setSelectedYear] = useState("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -41,23 +32,16 @@ const Projects = () => {
       setEditSelectedImage(event.target.files[0]);
     }
   };
-  // console.log(selectedFile);
 
   const formData = new FormData();
   const handleUpload = () => {
     if (selectedFile) {
-      // title, eventNewsType, eventNewsYear, shortDesc, participants, eventNewsLink
-      formData.append("projectImage", selectedFile);
       formData.append("title", title);
+      formData.append("logoLink", logoLink);
+      formData.append("logoImage", selectedFile);
       formData.append("shortDesc", shortDesc);
-      formData.append("type", options);
-      formData.append("projectLink", projectLink);
-      formData.append("projectYear", selectedYear);
 
-      //   formData.append("participants", participants);
-      console.log("selectedfile", selectedFile);
-
-      fetch(baseUrl + "/projects/addProjects", {
+      fetch(baseUrl + "/logo/addLogoImage", {
         method: "POST",
         body: formData,
       })
@@ -75,14 +59,9 @@ const Projects = () => {
           setIsOpen(false);
           setDataUpdate(!dataUpdate);
           setSelectedFile(null);
-          setProjectLink("");
-          //   setParticipants("");
-          setSelectedYear("");
+          setLogoLink("");
           setTitle("");
           setShortDesc("");
-          // console.log("data", data);
-          // console.log(res)
-          // Perform any additional actions or update the UI as needed
         })
         .catch((error) => {
           console.error("Error uploading file:", error);
@@ -90,35 +69,47 @@ const Projects = () => {
         });
     }
   };
+
   const handleEdit = async (cell: any) => {
-    setProjectID(cell.row.original.id);
-    // console.log("Single USer Data", projectID);
-    await fetch(baseUrl + `/projects/getProjectByID/${cell.row.original.id}`, {
-      method: "GET", // Use GET method for a GET request
-    })
-      .then((res) => res.json())
+    setLogoId(cell.row.original.id);
+
+    await fetch(
+      baseUrl + `/logo/getLogoImageById/${cell.row.original.id}`,
+      {
+        method: "GET", 
+      }
+    )
+      .then((res) =>{
+        console.log("response", res);
+        return res.json();
+      })
       .then((res) => {
         setEditTitle(res[0].title);
-        setEditProjectLink(res[0].projectLink);
-        setEditEventType(res[0].type);
-        // setEditParticipants(res[0].participants);
-         setEditSelectedImage(res[0].imagePath);
-        setEditSelectedYear(res[0].projectYear);
+        setEditLogoLink(res[0].logoLink);
         setEditShortDesc(res[0].shortDesc);
+        setEditSelectedImage(res[0].imagePath)
       })
       .then(() => {
         openEditModal();
       });
   };
-
-
   const getData = async () => {
-    return await getAllProjects();
-    
+    let response = await getAllLogoImages();
+    console.log(response);
+    setData(response);
+   
   };
- 
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  useEffect(() => {
+    getData();
+  }, [dataUpdate]);
+
   const handleDelete = async (cellValue: any) => {
-    let response = await deleteProjects(cellValue.row.original.id);
+    let response = await deleteLogoImages(cellValue.row.original.id);
     console.log(response);
     if (response) {
       toast.error("Deleted Successfully!", {
@@ -127,48 +118,18 @@ const Projects = () => {
       });
       setDataUpdate(!dataUpdate);
     }
-    // getData();
+  
   };
-  useMemo(async () => {
-    await getData().then((res) => {
-      console.log("res---------- - ", res);
-      if (res && res.length != 0) {
-        const filteredData = res.filter((item: any) => item.type == options);
-        // console.log("filtered", filteredData);
-        setData(filteredData);
-      }
-    });
-  }, [options]);
-
-  useMemo(async () => {
-    await getData().then((res) => {
-      // console.log("res - ", res);
-      if (res && res.length != 0) {
-        const filteredData = res.filter((item: any) => item.type == options);
-        // console.log("filtered", filteredData);
-        setData(filteredData);
-      }
-    });
-  }, [dataUpdate]);
-  // console.log("sorted data", data);
 
   let columns = React.useMemo<Column<any>[]>(
     () => [
-      // {
-      //   Header: "Sr .No.",
-      //   accessor: "title",
-      // },
       {
         Header: "Title",
         accessor: "title",
       },
       {
-        Header: "Year",
-        accessor: "projectYear",
-      },
-      {
         Header: "Image",
-        accessor: "projectImage",
+        accessor: "logoImage",
         Cell: ({ cell }) => {
           return (
             <div className="flex items-center justify-center h-full">
@@ -183,7 +144,7 @@ const Projects = () => {
       },
       {
         Header: "Link",
-        accessor: "projectLink",
+        accessor: "logoLink",
       },
       {
         Header: "Description",
@@ -259,26 +220,22 @@ const Projects = () => {
   const closeEditModal = () => {
     setIsModalOpen(false);
   };
-  let xdata = useMemo(() => data, [data]);
-
- 
 
   const handleEditUpload = () => {
     if (editSelectedImage) {
       const formData = new FormData();
-      formData.append("projectImage", editSelectedImage);
+      formData.append("logoImage", editSelectedImage);
       formData.append("title", editTitle);
       formData.append("shortDesc", editShortDesc);
-      formData.append("type", options);
-      formData.append("projectLink", editProjectLink);
-      formData.append("projectYear", editSelectedYear);
-      // formData.append("participants", editParticipants);
-      // console.log("formData in edit", formData);
+      formData.append("logoLink", editLogoLink);
 
-      fetch(baseUrl + `/projects/updateProjects/${projectID}`, {
-        method: "PUT",
-        body: formData,
-      })
+      fetch(
+        baseUrl +`/logo/updateLogoImages/${logoId}`,
+        {
+          method: "PUT",
+          body: formData,
+        }
+      )
         .then((res) => {
           console.log("response", res);
           return res.json();
@@ -290,73 +247,31 @@ const Projects = () => {
           });
           setDataUpdate(!dataUpdate);
           setEditSelectedImage(null);
-          // console.log("File uploaded successfully:", data);
-          // console.log("data", data);
+      
         })
         .catch((error) => {
           console.error("Error uploading file:", error);
-          // Handle the error and update the UI accordingly
         });
     }
     closeEditModal();
     getData();
   };
+
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
     useTable({ columns, data });
-
-  const currentYear = new Date().getFullYear();
-
-  // Generate an array of years from 2015 to the current year
-  const years = Array.from({ length: currentYear - 2014 }, (_, index) =>
-    (currentYear - index).toString()
-  );
-
-  // Event handler for when a year is selected
-  const handleYearSelect = (e: any) => {
-    setSelectedYear(e.target.value);
-  };
-  const handleEditYearSelect = (e: any) => {
-    setEditSelectedYear(e.target.value);
-  };
-  const projectOptions = [
-    "Water Conservation",
-    "Education",
-    "Employment",
-    "Tree Plantation",
-  ];
-
   return (
     <div className="h-screen p-3 overflow-auto pb-28 bg-bggrey">
-      <p className="pb-5 text-xl">Project Management</p>
+      <p className="pb-5 text-xl">Logo Management</p>
       <ToastContainer />
       <div className="bg-white border border-grey">
         <div className="flex justify-between">
-          <div className="items-center justify-start mt-3">
-            <label className="px-2 my-4 ml-2 font-semibold">Select Type</label>
-            <select
-              className="px-6 py-1 font-semibold bg-white border-b-2 border-gray-200 rounded shadow-md appearance-none focus:outline-none focus:shadow-outline"
-              name="options"
-              value={options}
-              onChange={(event: any) => setOptions(event.target.value)}
-            >
-              {/* <option value="Water Conservation">Water Conservation</option>
-              <option value="Education">Education</option>
-              <option value="Employment">Employment</option>
-              <option value="Tree Plantation">Tree Plantation</option> */}
-              {projectOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
+          <div className="items-center justify-start mt-3"></div>
 
           <label
             className="block px-4 py-2 mx-3 my-3 font-semibold leading-tight text-white border border-gray-300 rounded shadow appearance-none cursor-pointer bg-blue hover:border-gray-400 focus:outline-none focus:shadow-outline"
-            // htmlFor="my-modal-4"
             onClick={() => setIsOpen(true)}
           >
-            Add Project
+            Add Media
           </label>
         </div>
 
@@ -381,64 +296,10 @@ const Projects = () => {
                 {/* Body */}
                 <div className="relative flex-auto px-6">
                   {" "}
-                  <div>
+                  <div className="">
                     <div>
-                      {/* <div className="divider"></div> */}
                       <div className="flex justify-between">
                         <div className="grid grid-cols-3 gap-4">
-                          <div className="relative inline-block text-left">
-                            <label className="label">
-                              <span className="text-lg label-text">
-                                Select Type
-                              </span>
-                            </label>
-                            <select
-                              className="block w-full px-4 py-2 pr-8 leading-tight bg-white border border-gray-300 rounded shadow appearance-none hover:border-gray-400 focus:outline-none focus:shadow-outline"
-                              name="eventType"
-                              value={options}
-                              onChange={
-                                (event: any) => setOptions(event.target.value)
-                                //setEventType(event.target.value)
-                              }
-                            >
-                              {/* <option value="Water Conservation">
-                                Water Conservation
-                              </option>
-                              <option value="Education">Education</option>
-                              <option value="Employment">Employment</option>
-                              <option value="Tree Plantation">
-                                Tree Plantation
-                              </option> */}
-
-                              {projectOptions.map((option) => (
-                                <option key={option} value={option}>
-                                  {option}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="relative inline-block text-left">
-                            <label className="label">
-                              <span className="text-lg label-text">
-                                Select Year
-                              </span>
-                            </label>
-                            <select
-                              className="block w-full px-4 py-2 pr-8 leading-tight bg-white border border-gray-300 rounded shadow appearance-none hover:border-gray-400 focus:outline-none focus:shadow-outline"
-                              name="year"
-                              value={selectedYear}
-                              onChange={handleYearSelect}
-                            >
-                              <option value="" disabled>
-                                Select a year
-                              </option>
-                              {years.map((year) => (
-                                <option key={year} value={year}>
-                                  {year}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
                           <div>
                             <label className="label">
                               <span className="text-lg label-text">
@@ -477,16 +338,17 @@ const Projects = () => {
                               </span>
                             </label>
                             <input
-                              name="projectLink"
+                              name="logoLink"
                               type="text"
                               placeholder="Type here"
-                              value={projectLink}
+                              value={logoLink}
                               className="w-full px-4 py-2 border border-gray-300 rounded shadow h-[2.35rem]"
                               onChange={(event: any) =>
-                                setProjectLink(event.target.value)
+                                setLogoLink(event.target.value)
                               }
                             />
                           </div>
+
                           <div>
                             <label className="label">
                               <span className="text-lg label-text">
@@ -511,8 +373,8 @@ const Projects = () => {
                           onClick={handleUpload}
                           disabled={
                             !selectedFile ||
-                            !title || 
-                            !projectLink ||
+                            !title ||
+                            !logoLink ||
                             !shortDesc
                           }
                           className="btn btn-primary"
@@ -535,7 +397,7 @@ const Projects = () => {
             <table className="min-w-full bg-white border border-grey">
               <thead>
                 {headerGroups.map((headerGroup, index) => (
-                  <tr {...headerGroup.getHeaderGroupProps()}>
+                  <tr  {...headerGroup.getHeaderGroupProps()}>
                     <th>Sr. No</th>
                     {headerGroup.headers.map((column, index) => (
                       <th
@@ -591,7 +453,7 @@ const Projects = () => {
               <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none">
                 {/* Header */}
                 <div className="flex items-center justify-between px-4 mt-4 border-gray-300 border-solid rounded-t">
-                  <h3 className="text-2xl font-bold">Edit Media</h3>
+                  <h3 className="text-2xl font-bold">Edit Logo</h3>
                   <button
                     className="p-2 ml-auto text-2xl text-black bg-transparent border-0 outline-none focus:outline-none"
                     onClick={closeEditModal}
@@ -608,57 +470,6 @@ const Projects = () => {
                     <div>
                       <div className="flex justify-between">
                         <div className="grid grid-cols-3 gap-4">
-                          <div className="relative inline-block text-left">
-                            <label className="label">
-                              <span className="text-lg label-text">
-                                Select Type
-                              </span>
-                            </label>
-                            <select
-                              className="block w-full px-4 py-2 pr-8 leading-tight bg-white border border-gray-300 rounded shadow appearance-none hover:border-gray-400 focus:outline-none focus:shadow-outline"
-                              name="eventType"
-                              value={options}
-                              onChange={(event: any) =>
-                                setOptions(event.target.value)
-                              }
-                            >
-                              {/* <option value="Water Conservation">
-                                Water Conservation
-                              </option>
-                              <option value="Education">Education</option>
-                              <option value="Employment">Employment</option>
-                              <option value="Tree Plantation">
-                                Tree Plantation
-                              </option> */}
-                              {projectOptions.map((option) => (
-                                <option key={option} value={option}>
-                                  {option}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="relative inline-block text-left">
-                            <label className="label">
-                              <span className="text-lg label-text">
-                                Select Year
-                              </span>
-                            </label>
-                            <select
-                              className="block w-full px-4 py-2 pr-8 leading-tight bg-white border border-gray-300 rounded shadow appearance-none hover:border-gray-400 focus:outline-none focus:shadow-outline"
-                              name="year"
-                              value={editSelectedYear}
-                              onChange={handleEditYearSelect}
-                            >
-                              <option value="" disabled>
-                                Select a year
-                              </option>
-                              {years.map((year) => (
-                                <option key={year} value={year}>
-                                  {year}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
                           <div>
                             <label className="label">
                               <span className="text-lg label-text">
@@ -685,7 +496,7 @@ const Projects = () => {
                             </label>
                             <input
                               type="file"
-                              accept=".png"
+                              accept=".png,.jpeg,.jpg"
                               onChange={handleEditFileChange}
                               className="w-full px-2 py-1 border border-gray-300 rounded shadow h-[2.35rem]"
                             />
@@ -700,13 +511,14 @@ const Projects = () => {
                               name="memberName"
                               type="text"
                               placeholder="Type here"
-                              value={editProjectLink}
+                              value={editLogoLink}
                               className="w-full px-4 py-2 border border-gray-300 rounded shadow h-[2.35rem]"
                               onChange={(event: any) =>
-                                setEditProjectLink(event.target.value)
+                                setEditLogoLink(event.target.value)
                               }
                             />
                           </div>
+
                           <div>
                             <label className="label">
                               <span className="text-lg label-text">
@@ -748,6 +560,6 @@ const Projects = () => {
       </div>
     </div>
   );
-};
+}
 
-export default Projects;
+export default Logo;

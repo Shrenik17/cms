@@ -13,6 +13,8 @@ const Members = () => {
   const [editMemberName, setEditMemberName] = useState("");
   const [responseType, setResponseType] = useState<any>("");
   const [editMemberProfession, setEditMemberPRofession] = useState("");
+  const [editSelectedImage, setEditSelectedImage] = useState<File | null>(null);
+
   const [data, setData] = useState<any[]>([]); // Provide a type
   const [memberID, setMemberID] = useState<any>(null); // Provide a type
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,6 +33,7 @@ const Members = () => {
 
   const getData = async () => {
     let response = await getMember();
+    console.log(response.data);
     setData(response.data);
     if (response.type) {
       setResponseType("true");
@@ -111,6 +114,7 @@ const Members = () => {
         console.log("res", res);
         setEditMemberName(res.data[0].memberName);
         setEditMemberPRofession(res.data[0].memberProfession);
+        setSelectedFile(res.data[0].memberPhoto_path);
       })
       .then(() => {
         openModal();
@@ -492,9 +496,9 @@ const Members = () => {
                     } bg-[#5393E8] text-white active:bg-[#5393E8] font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150`}
                     type="button"
                     onClick={handleEditSubmit}
-                    disabled={
-                      !editMemberProfession || !editMemberName || !selectedFile
-                    }
+                    // disabled={
+                    //   !editMemberProfession || !editMemberName || !selectedFile
+                    // }
                   >
                     Save Changes
                   </button>

@@ -11,6 +11,7 @@ import Link from "next/link";
 import Projects from "../adminPages/Projects";
 import Report from "../adminPages/Reports";
 import Gallery from "../adminPages/Gallery";
+import Logo from "../adminPages/Logo";
 
 const Dashboard = () => {
   interface section {
@@ -50,6 +51,9 @@ const Dashboard = () => {
     case "blog":
       content = <Blogs />;
       break;
+      case "logo":
+        content = <Logo />;
+        break;
 
     case "members":
       content = <Members />;
@@ -65,14 +69,6 @@ const Dashboard = () => {
         break;
   }
 
-  // const getData = async () => {
-  //   const fetchedData = await fetchSection();
-  //   setData(fetchedData);
-  // };
-  // // console.log("data in file", data);
-  // useEffect(() => {
-  //   getData();
-  // }, []);
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -82,14 +78,7 @@ const Dashboard = () => {
             <Image src={logo} alt="" className="w-20 h-24" />
           </div>
           <ul className="p-4">
-            <li className="mb-4">
-              {/* <button
-                className="block hover:text-gray-300"
-                onClick={() => handleMenuClick("gallery")}
-              >
-                Gallery
-              </button> */}
-            </li>
+            
             <li className="mb-4">
               <button
                 className="block hover:text-gray-300"
@@ -98,22 +87,15 @@ const Dashboard = () => {
                 Members
               </button>
             </li>
-            {/* <li className="mb-4">
-              <button
-                className="block hover:text-gray-300"
-                onClick={() => handleMenuClick("blog")}
-              >
-                Blogs
-              </button>
-            </li>
             <li className="mb-4">
               <button
                 className="block hover:text-gray-300"
-                onClick={() => handleMenuClick("report")}
+                onClick={() => handleMenuClick("gallery")}
               >
-                Reports
+                Gallery
               </button>
-            </li> */}
+            </li>
+           
             <li className="mb-4">
               <button
                 className="block hover:text-gray-300"
@@ -141,23 +123,16 @@ const Dashboard = () => {
                   </li>
                 </ul>
               )}
-              {/* <ul>
-                <li>
-                  <button
-                    className="block hover:text-gray-300"
-                    onClick={() => handleMenuClick("blog")}
-                  >
-                    Blogs
-                  </button>
-                </li>
-                <li>
-                  <button onClick={() => handleMenuClick("report")}>
-                    Report
-                  </button>
-                </li>
-              </ul> */}
+             
             </li>
-
+            <li className="mb-4">
+              <button
+                className="block hover:text-gray-300"
+                onClick={() => handleMenuClick("logo")}
+              >
+               Logo
+              </button>
+            </li>
             <li className="mb-4">
               <button
                 className="block hover:text-gray-300"
