@@ -46,10 +46,10 @@ const Members = () => {
   useEffect(() => {
     getData();
   }, [dataUpdate]);
-
+  const formData = new FormData();
   const handleUpload = () => {
     if (selectedFile) {
-      const formData = new FormData();
+   
       formData.append("memberPhoto", selectedFile);
       formData.append("memberName", memberName);
       formData.append("memberProfession", memberProfession);
@@ -71,6 +71,9 @@ const Members = () => {
           // console.log("File uploaded successfully:", data);
           setIsOpen(false);
           setDataUpdate(!dataUpdate);
+          setSelectedFile(null);
+          setMemberName("");
+          setMemberProfession("");
           // console.log("data", data);
           // console.log(res)
           // Perform any additional actions or update the UI as needed
@@ -95,7 +98,7 @@ const Members = () => {
     let response = await deleteMember(cellValue.row.original.id);
     // getData();
     if (response) {
-      setDataUpdate(!dataUpdate);
+      setDataUpdate(prevState => !prevState);
       toast.error("Deleted Successfully!", {
         position: "bottom-right",
         autoClose: 1000,

@@ -130,7 +130,7 @@ const Events = () => {
         position: "bottom-right",
         autoClose: 1000,
       });
-      setDataUpdate(!dataUpdate);
+      setDataUpdate(prevState => !prevState);
     }
     // getData();
   };
@@ -236,7 +236,7 @@ const Events = () => {
 
             <button
               className="px-4 py-2 font-bold bg-red-500 rounded hover:bg-red-700"
-              onClick={(e) => handleDelete(cell)}
+              onClick={() => handleDelete(cell)}
             >
               <svg
                 viewBox="0 0 24 24"

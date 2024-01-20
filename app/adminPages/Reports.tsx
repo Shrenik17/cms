@@ -76,6 +76,11 @@ const Report = () => {
            console.log("File uploaded successfully:", data);
           setIsOpen(false);
           setDataUpdate(!dataUpdate);
+          setTitle("");
+          setSelectedFile(null);
+          setPublishedBy("");
+          setShortDesc("");
+          setSelectedYear("");
         
           // Perform any additional actions or update the UI as needed
         })
@@ -98,7 +103,7 @@ const Report = () => {
     let response = await deleteReport(cellValue.row.original.id);
     // getData();
     if (response) {
-      setDataUpdate(!dataUpdate);
+      setDataUpdate(prevState => !prevState);
       toast.error("Deleted Successfully!", {
         position: "bottom-right",
         autoClose: 1000,

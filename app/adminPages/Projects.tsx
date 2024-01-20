@@ -125,7 +125,7 @@ const Projects = () => {
         position: "bottom-right",
         autoClose: 1000,
       });
-      setDataUpdate(!dataUpdate);
+      setDataUpdate(prevState => !prevState);
     }
     // getData();
   };
