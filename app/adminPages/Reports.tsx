@@ -112,16 +112,17 @@ const Report = () => {
   };
   const handleEdit = async (cell: any) => {
     setReportID(cell.row.original.id);
-   console.log("id",reportID);
+  
     await fetch(baseUrl + `/report/getReportById/${cell.row.original.id}`, {
       method: "GET", // 
     })
       .then((res) => res.json())
       .then((res) => {
-        console.log("res", res);
+        setEditShortDesc(res.data[0].shortDesc);
         setEditTitle(res.data[0].title);
         setEditPublishedBY(res.data[0].publishedBy);
         setEditSelectedYear(res.data[0].reportYear);
+        setSelectedFile(res.data[0].pdfData);
       })
       .then(() => {
         openModal();
@@ -260,7 +261,7 @@ const Report = () => {
         Header: "Actions",
         Cell: ({ cell }: any) => (
           <div className="flex justify-center space-x-2">
-            {/* <label
+            <label
               className="px-4 py-2 font-bold bg-blue-500 rounded cursor-pointer hover:bg-blue-700"
               onClick={(e) => handleEdit(cell)}
               htmlFor="my-modal-5"
@@ -279,7 +280,7 @@ const Report = () => {
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
-            </label> */}
+            </label>
 
             {/* --------------------Edit user Modal Start----------------------*/}
          
@@ -662,9 +663,9 @@ const Report = () => {
                     } bg-[#5393E8] text-white active:bg-[#5393E8] font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150`}
                     type="button"
                     onClick={handleEditSubmit}
-                    disabled={
-                      !editPublishedBY || !editTitle || !selectedFile
-                    }
+                    // disabled={
+                    //   !editPublishedBY || !editTitle || !selectedFile
+                    // }
                   >
                     Save Changes
                   </button>

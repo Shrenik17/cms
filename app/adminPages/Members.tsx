@@ -46,6 +46,7 @@ const Members = () => {
   useEffect(() => {
     getData();
   }, [dataUpdate]);
+  
   const formData = new FormData();
   const handleUpload = () => {
     if (selectedFile) {
